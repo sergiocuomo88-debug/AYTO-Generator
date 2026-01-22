@@ -1,0 +1,682 @@
+/* AYTO Solver - Mobile-First Styles */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --primary: #e94560;
+    --primary-dark: #c73e54;
+    --secondary: #16213e;
+    --background: #1a1a2e;
+    --surface: #25253d;
+    --surface-light: #2d2d4a;
+    --text: #eaeaea;
+    --text-muted: #a0a0b0;
+    --success: #4ade80;
+    --warning: #fbbf24;
+    --danger: #ef4444;
+    --border: #3a3a5c;
+    --shadow: rgba(0, 0, 0, 0.3);
+
+    --radius: 12px;
+    --radius-small: 8px;
+    --spacing: 16px;
+    --spacing-small: 8px;
+    --spacing-large: 24px;
+
+    --font-main: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+}
+
+html {
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    font-family: var(--font-main);
+    background: var(--background);
+    color: var(--text);
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+
+#app {
+    max-width: 600px;
+    margin: 0 auto;
+    padding-bottom: env(safe-area-inset-bottom, 20px);
+}
+
+/* Header */
+.app-header {
+    background: var(--secondary);
+    padding: var(--spacing);
+    padding-top: calc(var(--spacing) + env(safe-area-inset-top, 0px));
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid var(--border);
+}
+
+.app-header h1 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: var(--spacing-small);
+    text-align: center;
+}
+
+.header-actions {
+    display: flex;
+    gap: var(--spacing-small);
+    justify-content: center;
+}
+
+/* Main Content */
+.app-main {
+    padding: var(--spacing);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing);
+}
+
+/* Sections */
+.section {
+    background: var(--surface);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: 0 2px 8px var(--shadow);
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-small);
+    padding: var(--spacing);
+    background: var(--surface-light);
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.section-header h2 {
+    font-size: 1rem;
+    font-weight: 600;
+    flex: 1;
+}
+
+.section-header .toggle-icon {
+    font-size: 1.25rem;
+    color: var(--text-muted);
+    width: 24px;
+    text-align: center;
+}
+
+.section-content {
+    padding: var(--spacing);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-small);
+}
+
+.section-content.collapsed {
+    display: none;
+}
+
+/* Badges */
+.badge {
+    background: var(--primary);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 10px;
+    min-width: 24px;
+    text-align: center;
+}
+
+/* Prize Display */
+.prize-amount {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--success);
+    margin-left: auto;
+    margin-right: var(--spacing-small);
+}
+
+/* Buttons */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 20px;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--radius-small);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: white;
+}
+
+.btn-primary:hover,
+.btn-primary:active {
+    background: var(--primary-dark);
+}
+
+.btn-secondary {
+    background: var(--surface-light);
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+
+.btn-secondary:hover,
+.btn-secondary:active {
+    background: var(--border);
+}
+
+.btn-small {
+    padding: 8px 12px;
+    font-size: 0.875rem;
+}
+
+.btn-danger {
+    background: var(--danger);
+    color: white;
+}
+
+.btn-danger:hover,
+.btn-danger:active {
+    background: #dc2626;
+}
+
+.btn-solve {
+    background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%);
+    color: white;
+    padding: 16px 24px;
+    font-size: 1.1rem;
+    width: 100%;
+}
+
+.btn-solve:hover,
+.btn-solve:active {
+    transform: scale(0.98);
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Form Elements */
+input, select, textarea {
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+    font-family: var(--font-main);
+    background: var(--background);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-small);
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23a0a0b0' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+}
+
+/* Form Layouts */
+.deduction-form,
+.matchbox-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-small);
+}
+
+.deduction-form .btn,
+.matchbox-form .btn {
+    grid-column: span 2;
+}
+
+.matchbox-form select,
+.matchbox-form input {
+    font-size: 0.875rem;
+    padding: 10px;
+}
+
+/* Candidates Edit */
+.candidates-edit {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing);
+}
+
+.candidates-column label,
+.candidates-inactive label {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+}
+
+.candidates-inactive {
+    margin-top: var(--spacing-small);
+}
+
+/* Item Lists */
+.item-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.item-list li {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-small);
+    padding: 10px 12px;
+    background: var(--background);
+    border-radius: var(--radius-small);
+    font-size: 0.9rem;
+}
+
+.item-list li .item-info {
+    flex: 1;
+}
+
+.item-list li .item-meta {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.item-list li .btn-remove {
+    background: transparent;
+    color: var(--danger);
+    padding: 4px 8px;
+    font-size: 1.25rem;
+    line-height: 1;
+}
+
+.item-list li .btn-remove:hover {
+    background: rgba(239, 68, 68, 0.2);
+}
+
+/* Status Icons */
+.status-icon {
+    font-size: 1.25rem;
+}
+
+.status-perfect { color: var(--success); }
+.status-no { color: var(--danger); }
+.status-sold { color: var(--warning); }
+
+/* Perfect Matches */
+.perfect-matches li {
+    background: rgba(74, 222, 128, 0.15);
+    border: 1px solid rgba(74, 222, 128, 0.3);
+}
+
+/* Matching Nights */
+.nights-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing);
+}
+
+.night-card {
+    background: var(--background);
+    border-radius: var(--radius-small);
+    overflow: hidden;
+}
+
+.night-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-small);
+    padding: 12px;
+    background: var(--surface-light);
+}
+
+.night-header h3 {
+    flex: 1;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.night-lights {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.night-lights input {
+    width: 60px;
+    text-align: center;
+    padding: 6px;
+    font-size: 1rem;
+}
+
+.night-lights-display {
+    font-size: 1.1rem;
+    min-width: 80px;
+}
+
+.night-pairs {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.night-pair {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 6px;
+    align-items: center;
+}
+
+.night-pair select {
+    font-size: 0.85rem;
+    padding: 8px;
+}
+
+.night-pair .btn-remove-pair {
+    padding: 6px 10px;
+    background: transparent;
+    color: var(--text-muted);
+}
+
+.night-pair .btn-remove-pair:hover {
+    color: var(--danger);
+}
+
+.night-actions {
+    padding: 12px;
+    padding-top: 0;
+    display: flex;
+    gap: var(--spacing-small);
+}
+
+.night-warning {
+    padding: 8px 12px;
+    background: rgba(251, 191, 36, 0.15);
+    border-left: 3px solid var(--warning);
+    font-size: 0.8rem;
+    color: var(--warning);
+}
+
+/* Solver Status */
+.solver-status {
+    text-align: center;
+    padding: var(--spacing-small);
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.solver-status.running {
+    color: var(--warning);
+}
+
+.solver-status.success {
+    color: var(--success);
+}
+
+.solver-status.error {
+    color: var(--danger);
+}
+
+.solver-stats {
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing);
+    padding: var(--spacing-small);
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+/* Probabilities */
+.probabilities-container {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.probabilities-container .hint {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    padding: var(--spacing);
+}
+
+.probability-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-small);
+    padding: 10px 12px;
+    background: var(--background);
+    border-radius: var(--radius-small);
+}
+
+.probability-item .pair-names {
+    flex: 1;
+    font-size: 0.9rem;
+    min-width: 0;
+}
+
+.probability-item .pair-names span {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.probability-item .pair-names .female {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.probability-bar-container {
+    width: 100px;
+    height: 24px;
+    background: var(--surface-light);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+}
+
+.probability-bar {
+    height: 100%;
+    transition: width 0.3s ease;
+}
+
+.probability-bar.low {
+    background: linear-gradient(90deg, #ef4444 0%, #f87171 100%);
+}
+
+.probability-bar.medium {
+    background: linear-gradient(90deg, #fbbf24 0%, #fcd34d 100%);
+}
+
+.probability-bar.high {
+    background: linear-gradient(90deg, #4ade80 0%, #86efac 100%);
+}
+
+.probability-value {
+    font-size: 0.9rem;
+    font-weight: 600;
+    min-width: 50px;
+    text-align: right;
+}
+
+/* Error Box */
+.error-box {
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid var(--danger);
+    border-radius: var(--radius-small);
+    padding: var(--spacing);
+    color: var(--danger);
+    font-size: 0.9rem;
+}
+
+.error-box.hidden {
+    display: none;
+}
+
+/* Modal */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing);
+    z-index: 1000;
+}
+
+.modal-overlay.hidden {
+    display: none;
+}
+
+.modal-content {
+    background: var(--surface);
+    border-radius: var(--radius);
+    width: 100%;
+    max-width: 400px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+#modal-body {
+    padding: var(--spacing);
+}
+
+#modal-body h3 {
+    margin-bottom: var(--spacing);
+}
+
+#modal-body select {
+    margin-bottom: var(--spacing-small);
+}
+
+.modal-actions {
+    display: flex;
+    gap: var(--spacing-small);
+    padding: var(--spacing);
+    border-top: 1px solid var(--border);
+}
+
+.modal-actions .btn {
+    flex: 1;
+}
+
+/* Footer */
+.app-footer {
+    text-align: center;
+    padding: var(--spacing);
+    color: var(--text-muted);
+    font-size: 0.75rem;
+}
+
+/* Section Danger */
+.section-danger {
+    background: transparent;
+    box-shadow: none;
+    padding: var(--spacing);
+}
+
+/* Hidden utility */
+.hidden {
+    display: none !important;
+}
+
+/* Responsive tweaks */
+@media (max-width: 400px) {
+    .candidates-edit {
+        grid-template-columns: 1fr;
+    }
+
+    .deduction-form,
+    .matchbox-form {
+        grid-template-columns: 1fr;
+    }
+
+    .deduction-form .btn,
+    .matchbox-form .btn {
+        grid-column: span 1;
+    }
+
+    .probability-bar-container {
+        width: 70px;
+    }
+}
+
+/* Dark mode is default, but add light mode option */
+@media (prefers-color-scheme: light) {
+    :root {
+        /* Keep dark mode as default for this app */
+    }
+}
+
+/* Animations */
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.solver-status.running {
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Touch improvements */
+@media (hover: none) {
+    .btn:active {
+        transform: scale(0.97);
+    }
+}
+
+/* Safe area padding for notched devices */
+@supports (padding: max(0px)) {
+    .app-header {
+        padding-left: max(var(--spacing), env(safe-area-inset-left));
+        padding-right: max(var(--spacing), env(safe-area-inset-right));
+    }
+
+    .app-main {
+        padding-left: max(var(--spacing), env(safe-area-inset-left));
+        padding-right: max(var(--spacing), env(safe-area-inset-right));
+    }
+}
