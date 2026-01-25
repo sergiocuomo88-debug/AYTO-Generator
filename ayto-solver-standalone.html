@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#1a1a2e">
+    <title>AYTO Solver - Staffel 7 (2026)</title>
+    <style>
+/* AYTO Solver - Mobile-First Styles */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+    --primary: #e94560;
+    --primary-dark: #c73e54;
+    --secondary: #16213e;
+    --background: #1a1a2e;
+    --surface: #25253d;
+    --surface-light: #2d2d4a;
+    --text: #eaeaea;
+    --text-muted: #a0a0b0;
+    --success: #4ade80;
+    --warning: #fbbf24;
+    --danger: #ef4444;
+    --border: #3a3a5c;
+    --radius: 12px;
+    --radius-small: 8px;
+    --spacing: 16px;
+    --spacing-small: 8px;
+    --font-main: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+html { font-size: 16px; }
+body {
+    font-family: var(--font-main);
+    background: var(--background);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.5;
+}
+
+#app { max-width: 600px; margin: 0 auto; padding-bottom: 20px; }
+
+.app-header {
+    background: var(--secondary);
+    padding: var(--spacing);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid var(--border);
+}
+.app-header h1 { font-size: 1.25rem; font-weight: 600; margin-bottom: var(--spacing-small); text-align: center; }
+.header-actions { display: flex; gap: var(--spacing-small); justify-content: center; }
+
+.app-main { padding: var(--spacing); display: flex; flex-direction: column; gap: var(--spacing); }
+
+.section {
+    background: var(--surface);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-small);
+    padding: var(--spacing);
+    background: var(--surface-light);
+    cursor: pointer;
+    user-select: none;
+}
+.section-header h2 { font-size: 1rem; font-weight: 600; flex: 1; }
+.section-header .toggle-icon { font-size: 1.25rem; color: var(--text-muted); width: 24px; text-align: center; }
+.section-content { padding: var(--spacing); display: flex; flex-direction: column; gap: var(--spacing-small); }
+.section-content.collapsed { display: none; }
+
+.badge {
+    background: var(--primary);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 10px;
+    min-width: 24px;
+    text-align: center;
+}
+
+.prize-amount { font-size: 1.1rem; font-weight: 700; color: var(--success); margin-left: auto; margin-right: var(--spacing-small); }
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 20px;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--radius-small);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.btn-primary { background: var(--primary); color: white; }
+.btn-primary:hover { background: var(--primary-dark); }
+.btn-secondary { background: var(--surface-light); color: var(--text); border: 1px solid var(--border); }
+.btn-small { padding: 8px 12px; font-size: 0.875rem; }
+.btn-danger { background: var(--danger); color: white; }
+.btn-solve {
+    background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%);
+    color: white;
+    padding: 16px 24px;
+    font-size: 1.1rem;
+    width: 100%;
+}
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+input, select, textarea {
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+    font-family: var(--font-main);
+    background: var(--background);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-small);
+}
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); }
+select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23a0a0b0' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+    -webkit-appearance: none;
+}
+textarea { resize: vertical; min-height: 80px; }
+
+.deduction-form, .matchbox-form { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-small); }
+.deduction-form .btn, .matchbox-form .btn { grid-column: span 2; }
+.matchbox-form select, .matchbox-form input { font-size: 0.875rem; padding: 10px; }
+
+.candidates-edit { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing); }
+.candidates-column label, .candidates-inactive label { display: block; font-size: 0.875rem; color: var(--text-muted); margin-bottom: 4px; }
+.candidates-inactive { margin-top: var(--spacing-small); }
+
+.item-list { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+.item-list li {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-small);
+    padding: 10px 12px;
+    background: var(--background);
+    border-radius: var(--radius-small);
+    font-size: 0.9rem;
+}
+.item-list li .item-info { flex: 1; }
+.item-list li .item-meta { font-size: 0.75rem; color: var(--text-muted); }
+.item-list li .btn-remove { background: transparent; color: var(--danger); padding: 4px 8px; font-size: 1.25rem; line-height: 1; }
+
+.status-icon { font-size: 1.25rem; }
+.status-perfect { color: var(--success); }
+.status-no { color: var(--danger); }
+.status-sold { color: var(--warning); }
+
+.perfect-matches li { background: rgba(74, 222, 128, 0.15); border: 1px solid rgba(74, 222, 128, 0.3); }
+
+.nights-container { display: flex; flex-direction: column; gap: var(--spacing); }
+.night-card { background: var(--background); border-radius: var(--radius-small); overflow: hidden; }
+.night-header { display: flex; align-items: center; gap: var(--spacing-small); padding: 12px; background: var(--surface-light); }
+.night-header h3 { flex: 1; font-size: 0.9rem; font-weight: 600; }
+.night-lights { display: flex; align-items: center; gap: 4px; }
+.night-lights input { width: 60px; text-align: center; padding: 6px; font-size: 1rem; }
+.night-lights-display { font-size: 1.1rem; min-width: 80px; }
+.night-pairs { padding: 12px; display: flex; flex-direction: column; gap: 6px; }
+.night-pair { display: grid; grid-template-columns: 1fr 1fr auto; gap: 6px; align-items: center; }
+.night-pair select { font-size: 0.85rem; padding: 8px; }
+.night-pair .btn-remove-pair { padding: 6px 10px; background: transparent; color: var(--text-muted); }
+.night-actions { padding: 12px; padding-top: 0; display: flex; gap: var(--spacing-small); }
+.night-warning { padding: 8px 12px; background: rgba(251, 191, 36, 0.15); border-left: 3px solid var(--warning); font-size: 0.8rem; color: var(--warning); }
+
+.solver-status { text-align: center; padding: var(--spacing-small); font-size: 0.9rem; color: var(--text-muted); }
+.solver-status.running { color: var(--warning); animation: pulse 1.5s ease-in-out infinite; }
+.solver-status.success { color: var(--success); }
+.solver-status.error { color: var(--danger); }
+.solver-stats { display: flex; justify-content: center; gap: var(--spacing); padding: var(--spacing-small); font-size: 0.85rem; color: var(--text-muted); }
+
+.probabilities-container { display: flex; flex-direction: column; gap: 6px; }
+.probabilities-container .hint { text-align: center; color: var(--text-muted); font-size: 0.9rem; padding: var(--spacing); }
+.probability-item { display: flex; align-items: center; gap: var(--spacing-small); padding: 10px 12px; background: var(--background); border-radius: var(--radius-small); }
+.probability-item .pair-names { flex: 1; font-size: 0.9rem; min-width: 0; }
+.probability-item .pair-names span { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.probability-item .pair-names .female { font-size: 0.8rem; color: var(--text-muted); }
+.probability-bar-container { width: 100px; height: 24px; background: var(--surface-light); border-radius: 4px; overflow: hidden; }
+.probability-bar { height: 100%; transition: width 0.3s ease; }
+.probability-bar.low { background: linear-gradient(90deg, #ef4444 0%, #f87171 100%); }
+.probability-bar.medium { background: linear-gradient(90deg, #fbbf24 0%, #fcd34d 100%); }
+.probability-bar.high { background: linear-gradient(90deg, #4ade80 0%, #86efac 100%); }
+.probability-value { font-size: 0.9rem; font-weight: 600; min-width: 50px; text-align: right; }
+
+.error-box { background: rgba(239, 68, 68, 0.15); border: 1px solid var(--danger); border-radius: var(--radius-small); padding: var(--spacing); color: var(--danger); font-size: 0.9rem; }
+.error-box.hidden { display: none; }
+
+.modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7); display: flex; align-items: center; justify-content: center; padding: var(--spacing); z-index: 1000; }
+.modal-overlay.hidden { display: none; }
+.modal-content { background: var(--surface); border-radius: var(--radius); width: 100%; max-width: 400px; max-height: 80vh; overflow-y: auto; }
+#modal-body { padding: var(--spacing); }
+#modal-body h3 { margin-bottom: var(--spacing); }
+.modal-actions { display: flex; gap: var(--spacing-small); padding: var(--spacing); border-top: 1px solid var(--border); }
+.modal-actions .btn { flex: 1; }
+
+.app-footer { text-align: center; padding: var(--spacing); color: var(--text-muted); font-size: 0.75rem; }
+.section-danger { background: transparent; box-shadow: none; padding: var(--spacing); }
+.hidden { display: none !important; }
+
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+@media (max-width: 400px) {
+    .candidates-edit { grid-template-columns: 1fr; }
+    .deduction-form, .matchbox-form { grid-template-columns: 1fr; }
+    .deduction-form .btn, .matchbox-form .btn { grid-column: span 1; }
+    .probability-bar-container { width: 70px; }
+}
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header class="app-header">
+            <h1>Are You The One? Staffel 7</h1>
+            <div class="header-actions">
+                <button id="btn-export" class="btn btn-primary">Export</button>
+                <button id="btn-import" class="btn btn-secondary">Import</button>
+                <input type="file" id="import-file" accept=".json" hidden>
+            </div>
+        </header>
+
+        <main class="app-main">
+            <div id="error-box" class="error-box hidden"></div>
+
+            <section class="section" id="section-prize">
+                <div class="section-header" data-toggle="prize-content">
+                    <h2>Preisgeld</h2>
+                    <span class="prize-amount" id="prize-display">200.000 EUR</span>
+                    <span class="toggle-icon">-</span>
+                </div>
+                <div class="section-content" id="prize-content">
+                    <div class="deduction-form">
+                        <input type="number" id="deduction-amount" placeholder="Betrag" min="0" step="1000">
+                        <input type="text" id="deduction-reason" placeholder="Grund (z.B. Strafe Ep.3)">
+                        <button id="btn-add-deduction" class="btn btn-small">+ Abzug</button>
+                    </div>
+                    <ul id="deductions-list" class="item-list"></ul>
+                </div>
+            </section>
+
+            <section class="section" id="section-candidates">
+                <div class="section-header" data-toggle="candidates-content">
+                    <h2>Teilnehmer</h2>
+                    <span class="toggle-icon">+</span>
+                </div>
+                <div class="section-content collapsed" id="candidates-content">
+                    <div class="candidates-edit">
+                        <div class="candidates-column">
+                            <label>Maenner (je Zeile einer):</label>
+                            <textarea id="males-textarea" rows="6"></textarea>
+                        </div>
+                        <div class="candidates-column">
+                            <label>Frauen (je Zeile eine):</label>
+                            <textarea id="females-textarea" rows="6"></textarea>
+                        </div>
+                    </div>
+                    <div class="candidates-inactive">
+                        <label>Inaktiv/Nachzuegler (Format: Name,male oder Name,female):</label>
+                        <textarea id="inactive-textarea" rows="3"></textarea>
+                    </div>
+                    <button id="btn-save-candidates" class="btn btn-primary">Teilnehmer speichern</button>
+                    <button id="btn-activate-candidate" class="btn btn-secondary">Nachzuegler aktivieren</button>
+                </div>
+            </section>
+
+            <section class="section" id="section-matchbox">
+                <div class="section-header" data-toggle="matchbox-content">
+                    <h2>Matchbox</h2>
+                    <span class="badge" id="matchbox-count">0</span>
+                    <span class="toggle-icon">-</span>
+                </div>
+                <div class="section-content" id="matchbox-content">
+                    <div class="matchbox-form">
+                        <select id="matchbox-male"></select>
+                        <select id="matchbox-female"></select>
+                        <select id="matchbox-result">
+                            <option value="">Ergebnis...</option>
+                            <option value="perfect">Perfect Match</option>
+                            <option value="no">Kein Match</option>
+                            <option value="sold">Verkauft</option>
+                        </select>
+                        <input type="number" id="matchbox-sold-amount" placeholder="Verkaufspreis" min="0" step="1000" class="hidden">
+                        <input type="number" id="matchbox-episode" placeholder="Episode" min="1" max="20">
+                        <button id="btn-add-matchbox" class="btn btn-small">+ Matchbox</button>
+                    </div>
+                    <ul id="matchbox-list" class="item-list"></ul>
+                </div>
+            </section>
+
+            <section class="section" id="section-nights">
+                <div class="section-header" data-toggle="nights-content">
+                    <h2>Matching Nights</h2>
+                    <span class="badge" id="nights-count">0</span>
+                    <span class="toggle-icon">-</span>
+                </div>
+                <div class="section-content" id="nights-content">
+                    <button id="btn-add-night" class="btn btn-primary">+ Neue Matching Night</button>
+                    <div id="nights-list" class="nights-container"></div>
+                </div>
+            </section>
+
+            <section class="section" id="section-solver">
+                <div class="section-header">
+                    <h2>Exakte Berechnung</h2>
+                </div>
+                <div class="section-content">
+                    <button id="btn-solve" class="btn btn-solve">Wahrscheinlichkeiten berechnen</button>
+                    <div id="solver-status" class="solver-status"></div>
+                    <div id="solver-stats" class="solver-stats hidden">
+                        <span id="stat-solutions">0 Loesungen</span>
+                        <span id="stat-time">0ms</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section" id="section-perfect">
+                <div class="section-header" data-toggle="perfect-content">
+                    <h2>Bestaetigte Perfect Matches</h2>
+                    <span class="badge" id="perfect-count">0</span>
+                    <span class="toggle-icon">-</span>
+                </div>
+                <div class="section-content" id="perfect-content">
+                    <ul id="perfect-list" class="item-list perfect-matches"></ul>
+                </div>
+            </section>
+
+            <section class="section" id="section-probabilities">
+                <div class="section-header" data-toggle="probabilities-content">
+                    <h2>Paar-Wahrscheinlichkeiten</h2>
+                    <span class="toggle-icon">-</span>
+                </div>
+                <div class="section-content" id="probabilities-content">
+                    <div id="probabilities-list" class="probabilities-container">
+                        <p class="hint">Druecke "Wahrscheinlichkeiten berechnen" um die Analyse zu starten.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section section-danger">
+                <button id="btn-reset" class="btn btn-danger">Alle Daten zuruecksetzen</button>
+            </section>
+        </main>
+
+        <footer class="app-footer">
+            <p>AYTO Solver v1.0 - Constraint-basierte exakte Berechnung</p>
+        </footer>
+    </div>
+
+    <div id="modal-overlay" class="modal-overlay hidden">
+        <div id="modal-content" class="modal-content">
+            <div id="modal-body"></div>
+            <div class="modal-actions">
+                <button id="modal-cancel" class="btn btn-secondary">Abbrechen</button>
+                <button id="modal-confirm" class="btn btn-primary">Bestaetigen</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+(function() {
+    'use strict';
+
+    var CONFIG = { INITIAL_PRIZE: 200000, SOLVER_TIME_LIMIT: 5000, STORAGE_KEY: 'ayto_solver_state', VERSION: '1.0' };
+
+    var DEFAULT_MALES = ['Chris', 'Ema', 'Evi', 'Jeronymo', 'Jerry', 'Julian M.', 'Julian S.', 'Luke', 'Meji', 'Noel'];
+    var DEFAULT_FEMALES = ['Adrianna', 'Alicia', 'Aurora', 'Elena', 'Ella', 'Laura', 'Linda', 'Marla', 'Michelle', 'Tiziana', 'Tonia'];
+    var DEFAULT_INACTIVE = [];
+
+    var state = {
+        candidates: { males: DEFAULT_MALES.slice(), females: DEFAULT_FEMALES.slice(), inactive: DEFAULT_INACTIVE.slice() },
+        truthBooth: [], matchingNights: [], deductions: [], solverResult: null
+    };
+    var nextId = 1;
+
+    function generateId() { return nextId++; }
+    function saveToStorage() {
+        try { localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify({ version: CONFIG.VERSION, nextId: nextId, state: state })); }
+        catch (e) { console.error('Save failed:', e); }
+    }
+    function loadFromStorage() {
+        try {
+            var raw = localStorage.getItem(CONFIG.STORAGE_KEY);
+            if (raw) { var data = JSON.parse(raw); state = data.state; nextId = data.nextId || 1; return true; }
+        } catch (e) { console.error('Load failed:', e); }
+        return false;
+    }
+
+    function exportData() {
+        var data = { version: CONFIG.VERSION, exportDate: new Date().toISOString(), candidates: state.candidates, truthBooth: state.truthBooth, matchingNights: state.matchingNights, deductions: state.deductions };
+        var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url; a.download = 'ayto-solver-' + new Date().toISOString().slice(0, 10) + '.json';
+        document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+    }
+
+    function importData(file) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                var data = JSON.parse(e.target.result);
+                if (!data.candidates || !data.candidates.males) throw new Error('Ungueltige Datei');
+                state.candidates = data.candidates; state.truthBooth = data.truthBooth || []; state.matchingNights = data.matchingNights || []; state.deductions = data.deductions || []; state.solverResult = null;
+                var allIds = state.truthBooth.map(function(t){return t.id}).concat(state.matchingNights.map(function(n){return n.id})).concat(state.deductions.map(function(d){return d.id})).filter(function(id){return typeof id === 'number'});
+                nextId = allIds.length > 0 ? Math.max.apply(null, allIds) + 1 : 1;
+                saveToStorage(); render(); hideError(); showStatus('Import erfolgreich!', 'success');
+            } catch (err) { showError('Import fehlgeschlagen: ' + err.message); }
+        };
+        reader.readAsText(file);
+    }
+
+    function getPrizePool() { return CONFIG.INITIAL_PRIZE - state.deductions.reduce(function(sum, d) { return sum + (d.amount || 0); }, 0); }
+    function formatCurrency(amount) { return amount.toLocaleString('de-DE') + ' EUR'; }
+    function getPerfectMatches() { return state.truthBooth.filter(function(t) { return t.result === 'perfect'; }); }
+    function getNoMatches() { return state.truthBooth.filter(function(t) { return t.result === 'no'; }); }
+
+    function validateNight(night) {
+        var males = state.candidates.males, females = state.candidates.females, errors = [];
+        if (!night.pairs || night.pairs.length === 0) { errors.push('Keine Paare'); return { valid: false, errors: errors }; }
+        var usedMales = {}, usedFemales = {};
+        for (var i = 0; i < night.pairs.length; i++) {
+            var pair = night.pairs[i];
+            if (!pair.male || !pair.female) { errors.push('Unvollstaendig'); continue; }
+            if (males.indexOf(pair.male) === -1) errors.push('Unbekannt: ' + pair.male);
+            if (females.indexOf(pair.female) === -1) errors.push('Unbekannt: ' + pair.female);
+            if (usedMales[pair.male]) errors.push('Doppelt: ' + pair.male);
+            if (usedFemales[pair.female]) errors.push('Doppelt: ' + pair.female);
+            usedMales[pair.male] = true; usedFemales[pair.female] = true;
+        }
+        var usedMCount = Object.keys(usedMales).length, usedFCount = Object.keys(usedFemales).length;
+        var isBijection = usedMCount === males.length && usedFCount === females.length && usedMCount === usedFCount;
+        if (!isBijection && errors.length === 0) errors.push('Nicht vollstaendig (' + usedMCount + '/' + males.length + ')');
+        if (typeof night.lights !== 'number' || night.lights < 0) errors.push('Ungueltige Lichter');
+        return { valid: errors.length === 0 && isBijection, errors: errors };
+    }
+
+    function solve() {
+        var startTime = performance.now();
+        var males = state.candidates.males, females = state.candidates.females;
+        if (males.length !== females.length) return { solutionsCount: 0, pairFrequencies: {}, runtime: performance.now() - startTime, error: 'Anzahl Maenner (' + males.length + ') != Frauen (' + females.length + ')' };
+        var n = males.length;
+        if (n === 0) return { solutionsCount: 0, pairFrequencies: {}, runtime: performance.now() - startTime, error: 'Keine Teilnehmer' };
+
+        var perfectMatches = getPerfectMatches(), noMatches = getNoMatches();
+        var domains = {};
+        for (var i = 0; i < males.length; i++) { domains[males[i]] = {}; for (var j = 0; j < females.length; j++) domains[males[i]][females[j]] = true; }
+        for (var i = 0; i < perfectMatches.length; i++) {
+            var pm = perfectMatches[i];
+            if (males.indexOf(pm.male) !== -1 && females.indexOf(pm.female) !== -1) {
+                domains[pm.male] = {}; domains[pm.male][pm.female] = true;
+                for (var k = 0; k < males.length; k++) if (males[k] !== pm.male) delete domains[males[k]][pm.female];
+            }
+        }
+        for (var i = 0; i < noMatches.length; i++) {
+            var nm = noMatches[i];
+            if (males.indexOf(nm.male) !== -1 && domains[nm.male]) delete domains[nm.male][nm.female];
+        }
+        for (var i = 0; i < males.length; i++) if (Object.keys(domains[males[i]]).length === 0) return { solutionsCount: 0, pairFrequencies: {}, runtime: performance.now() - startTime, error: 'Keine Option fuer ' + males[i] };
+
+        var validNights = state.matchingNights.filter(function(night) { return validateNight(night).valid; });
+        var nightConstraints = validNights.map(function(night) {
+            var pairSet = {};
+            for (var i = 0; i < night.pairs.length; i++) pairSet[night.pairs[i].male + '|' + night.pairs[i].female] = true;
+            return { pairSet: pairSet, lights: night.lights };
+        });
+
+        var pairFrequencies = {};
+        for (var i = 0; i < males.length; i++) { pairFrequencies[males[i]] = {}; for (var j = 0; j < females.length; j++) pairFrequencies[males[i]][females[j]] = 0; }
+
+        var solutionsCount = 0, timedOut = false;
+
+        function backtrack(assignment, usedFemales, maleIndex, maleOrder) {
+            if (performance.now() - startTime > CONFIG.SOLVER_TIME_LIMIT) { timedOut = true; return; }
+            if (maleIndex === maleOrder.length) {
+                for (var ni = 0; ni < nightConstraints.length; ni++) {
+                    var nc = nightConstraints[ni], matches = 0;
+                    for (var mi = 0; mi < males.length; mi++) if (nc.pairSet[males[mi] + '|' + assignment[males[mi]]]) matches++;
+                    if (matches !== nc.lights) return;
+                }
+                solutionsCount++;
+                for (var mi = 0; mi < males.length; mi++) pairFrequencies[males[mi]][assignment[males[mi]]]++;
+                return;
+            }
+            var currentMale = maleOrder[maleIndex];
+            for (var ni = 0; ni < nightConstraints.length; ni++) {
+                var nc = nightConstraints[ni], currentMatches = 0, potentialMax = 0;
+                for (var mi = 0; mi < maleOrder.length; mi++) {
+                    var m = maleOrder[mi], nightPairFemale = null;
+                    for (var key in nc.pairSet) if (key.indexOf(m + '|') === 0) { nightPairFemale = key.split('|')[1]; break; }
+                    if (mi < maleIndex) {
+                        if (nc.pairSet[m + '|' + assignment[m]]) { currentMatches++; potentialMax++; }
+                    } else {
+                        if (nightPairFemale && domains[m][nightPairFemale] && !usedFemales[nightPairFemale]) potentialMax++;
+                    }
+                }
+                if (currentMatches > nc.lights || potentialMax < nc.lights) return;
+            }
+            var domain = domains[currentMale];
+            for (var female in domain) {
+                if (usedFemales[female]) continue;
+                assignment[currentMale] = female; usedFemales[female] = true;
+                backtrack(assignment, usedFemales, maleIndex + 1, maleOrder);
+                if (timedOut) return;
+                delete usedFemales[female]; delete assignment[currentMale];
+            }
+        }
+
+        var maleOrder = males.slice().sort(function(a, b) { return Object.keys(domains[a]).length - Object.keys(domains[b]).length; });
+        backtrack({}, {}, 0, maleOrder);
+        var runtime = performance.now() - startTime;
+        if (timedOut) return { solutionsCount: solutionsCount, pairFrequencies: pairFrequencies, runtime: runtime, error: 'Zeitlimit! ' + solutionsCount + ' Loesungen gefunden.' };
+        return { solutionsCount: solutionsCount, pairFrequencies: pairFrequencies, runtime: runtime, error: solutionsCount === 0 ? 'Keine Loesung - Constraints pruefen!' : null };
+    }
+
+    function escapeHtml(text) { if (!text) return ''; var div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
+    function showError(message) { var box = document.getElementById('error-box'); box.textContent = message; box.classList.remove('hidden'); }
+    function hideError() { document.getElementById('error-box').classList.add('hidden'); }
+    function showStatus(message, type) { var s = document.getElementById('solver-status'); s.textContent = message; s.className = 'solver-status ' + (type || ''); }
+
+    function render() {
+        document.getElementById('prize-display').textContent = formatCurrency(getPrizePool());
+
+        var dList = document.getElementById('deductions-list'); dList.innerHTML = '';
+        for (var i = 0; i < state.deductions.length; i++) {
+            var d = state.deductions[i];
+            var li = document.createElement('li');
+            li.innerHTML = '<span class="item-info"><strong>-' + formatCurrency(d.amount) + '</strong><span class="item-meta">' + escapeHtml(d.reason || '') + '</span></span><button class="btn btn-remove" data-id="' + d.id + '" data-type="deduction">x</button>';
+            dList.appendChild(li);
+        }
+
+        document.getElementById('males-textarea').value = state.candidates.males.join('\n');
+        document.getElementById('females-textarea').value = state.candidates.females.join('\n');
+        document.getElementById('inactive-textarea').value = state.candidates.inactive.map(function(i) { return i.name + ',' + i.gender; }).join('\n');
+
+        var mOpts = '<option value="">Mann...</option>' + state.candidates.males.map(function(m) { return '<option value="' + escapeHtml(m) + '">' + escapeHtml(m) + '</option>'; }).join('');
+        var fOpts = '<option value="">Frau...</option>' + state.candidates.females.map(function(f) { return '<option value="' + escapeHtml(f) + '">' + escapeHtml(f) + '</option>'; }).join('');
+        document.getElementById('matchbox-male').innerHTML = mOpts;
+        document.getElementById('matchbox-female').innerHTML = fOpts;
+
+        var mList = document.getElementById('matchbox-list'); mList.innerHTML = '';
+        var sortedTruth = state.truthBooth.slice().sort(function(a, b) { return (a.episode || 0) - (b.episode || 0); });
+        for (var i = 0; i < sortedTruth.length; i++) {
+            var t = sortedTruth[i];
+            var icon = t.result === 'perfect' ? '<span class="status-icon status-perfect">&#10003;</span>' : t.result === 'no' ? '<span class="status-icon status-no">&#10007;</span>' : '<span class="status-icon status-sold">&#128566;</span>';
+            var sold = t.result === 'sold' && t.soldAmount ? ' (' + formatCurrency(t.soldAmount) + ')' : '';
+            var li = document.createElement('li');
+            li.innerHTML = icon + '<span class="item-info"><strong>' + escapeHtml(t.male) + ' & ' + escapeHtml(t.female) + '</strong><span class="item-meta">Ep. ' + (t.episode || '?') + sold + '</span></span><button class="btn btn-remove" data-id="' + t.id + '" data-type="truthBooth">x</button>';
+            mList.appendChild(li);
+        }
+
+        var nContainer = document.getElementById('nights-list'); nContainer.innerHTML = '';
+        var sortedNights = state.matchingNights.slice().sort(function(a, b) { return (a.episode || 0) - (b.episode || 0); });
+        for (var ni = 0; ni < sortedNights.length; ni++) {
+            var night = sortedNights[ni];
+            var validation = validateNight(night);
+            var card = document.createElement('div'); card.className = 'night-card'; card.dataset.id = night.id;
+            var pairsHtml = '';
+            for (var pi = 0; pi < Math.max(night.pairs.length, 1); pi++) {
+                var pair = night.pairs[pi] || { male: '', female: '' };
+                pairsHtml += '<div class="night-pair"><select data-type="male" data-night="' + night.id + '" data-index="' + pi + '">' + '<option value="">Mann...</option>' + state.candidates.males.map(function(m) { return '<option value="' + escapeHtml(m) + '"' + (pair.male === m ? ' selected' : '') + '>' + escapeHtml(m) + '</option>'; }).join('') + '</select><select data-type="female" data-night="' + night.id + '" data-index="' + pi + '">' + '<option value="">Frau...</option>' + state.candidates.females.map(function(f) { return '<option value="' + escapeHtml(f) + '"' + (pair.female === f ? ' selected' : '') + '>' + escapeHtml(f) + '</option>'; }).join('') + '</select><button class="btn btn-remove-pair" data-night="' + night.id + '" data-index="' + pi + '">x</button></div>';
+            }
+            var lightsDisp = ''; for (var l = 0; l < (night.lights || 0); l++) lightsDisp += '<span style="color:var(--warning)">&#128161;</span>';
+            card.innerHTML = '<div class="night-header"><h3>Episode ' + (night.episode || '?') + '</h3><div class="night-lights"><input type="number" value="' + (night.lights || 0) + '" min="0" max="' + state.candidates.males.length + '" data-night="' + night.id + '" data-field="lights"><span class="night-lights-display">' + lightsDisp + '</span></div><button class="btn btn-remove btn-small" data-id="' + night.id + '" data-type="night">x</button></div>' + (!validation.valid ? '<div class="night-warning">&#9888; ' + validation.errors.join(', ') + '</div>' : '') + '<div class="night-pairs">' + pairsHtml + '</div><div class="night-actions"><button class="btn btn-small btn-secondary" data-action="add-pair" data-night="' + night.id + '">+ Paar</button></div>';
+            nContainer.appendChild(card);
+        }
+
+        var pList = document.getElementById('perfect-list');
+        var perfectMatches = getPerfectMatches();
+        pList.innerHTML = perfectMatches.length === 0 ? '<li style="color:var(--text-muted)">Noch keine Perfect Matches</li>' : '';
+        for (var i = 0; i < perfectMatches.length; i++) {
+            var pm = perfectMatches[i];
+            var li = document.createElement('li');
+            li.innerHTML = '<span class="status-icon status-perfect">&#10003;</span><span class="item-info"><strong>' + escapeHtml(pm.male) + ' & ' + escapeHtml(pm.female) + '</strong></span>';
+            pList.appendChild(li);
+        }
+
+        var probContainer = document.getElementById('probabilities-content');
+        var result = state.solverResult;
+        if (!result) { probContainer.innerHTML = '<p class="hint">Druecke "Wahrscheinlichkeiten berechnen"</p>'; }
+        else if (result.error && result.solutionsCount === 0) { probContainer.innerHTML = '<p class="hint" style="color:var(--danger)">' + escapeHtml(result.error) + '</p>'; }
+        else {
+            var probs = [], perfectPairs = {};
+            for (var i = 0; i < perfectMatches.length; i++) perfectPairs[perfectMatches[i].male + '|' + perfectMatches[i].female] = true;
+            for (var m = 0; m < state.candidates.males.length; m++) {
+                for (var f = 0; f < state.candidates.females.length; f++) {
+                    var male = state.candidates.males[m], female = state.candidates.females[f];
+                    if (perfectPairs[male + '|' + female]) continue;
+                    var freq = (result.pairFrequencies[male] && result.pairFrequencies[male][female]) || 0;
+                    var prob = result.solutionsCount > 0 ? freq / result.solutionsCount : 0;
+                    if (prob > 0) probs.push({ male: male, female: female, prob: prob });
+                }
+            }
+            probs.sort(function(a, b) { return b.prob - a.prob; });
+            if (probs.length === 0) { probContainer.innerHTML = '<p class="hint">Keine Wahrscheinlichkeiten</p>'; }
+            else {
+                var html = '';
+                for (var i = 0; i < probs.length; i++) {
+                    var p = probs[i], pct = (p.prob * 100).toFixed(1);
+                    var cls = p.prob >= 0.5 ? 'high' : p.prob >= 0.2 ? 'medium' : 'low';
+                    html += '<div class="probability-item"><div class="pair-names"><span class="male">' + escapeHtml(p.male) + '</span><span class="female">' + escapeHtml(p.female) + '</span></div><div class="probability-bar-container"><div class="probability-bar ' + cls + '" style="width:' + pct + '%"></div></div><span class="probability-value">' + pct + '%</span></div>';
+                }
+                probContainer.innerHTML = html;
+            }
+        }
+
+        document.getElementById('matchbox-count').textContent = state.truthBooth.length;
+        document.getElementById('nights-count').textContent = state.matchingNights.length;
+        document.getElementById('perfect-count').textContent = perfectMatches.length;
+    }
+
+    function showModal(title, content, onConfirm) {
+        var overlay = document.getElementById('modal-overlay'), body = document.getElementById('modal-body');
+        body.innerHTML = '<h3>' + title + '</h3>' + content;
+        overlay.classList.remove('hidden');
+        var confirmBtn = document.getElementById('modal-confirm'), cancelBtn = document.getElementById('modal-cancel');
+        var newConfirm = confirmBtn.cloneNode(true), newCancel = cancelBtn.cloneNode(true);
+        confirmBtn.parentNode.replaceChild(newConfirm, confirmBtn);
+        cancelBtn.parentNode.replaceChild(newCancel, cancelBtn);
+        newConfirm.addEventListener('click', onConfirm);
+        newCancel.addEventListener('click', function() { document.getElementById('modal-overlay').classList.add('hidden'); });
+    }
+
+    function setup() {
+        document.querySelectorAll('.section-header[data-toggle]').forEach(function(header) {
+            header.addEventListener('click', function() {
+                var content = document.getElementById(this.dataset.toggle), icon = this.querySelector('.toggle-icon');
+                if (content.classList.contains('collapsed')) { content.classList.remove('collapsed'); icon.textContent = '-'; }
+                else { content.classList.add('collapsed'); icon.textContent = '+'; }
+            });
+        });
+
+        document.getElementById('btn-export').addEventListener('click', exportData);
+        document.getElementById('btn-import').addEventListener('click', function() { document.getElementById('import-file').click(); });
+        document.getElementById('import-file').addEventListener('change', function(e) { if (e.target.files.length > 0) { importData(e.target.files[0]); e.target.value = ''; } });
+
+        document.getElementById('btn-add-deduction').addEventListener('click', function() {
+            var amount = parseInt(document.getElementById('deduction-amount').value) || 0;
+            var reason = document.getElementById('deduction-reason').value.trim();
+            if (amount <= 0) { showError('Gueltigen Betrag eingeben'); return; }
+            state.deductions.push({ id: generateId(), amount: amount, reason: reason });
+            document.getElementById('deduction-amount').value = '';
+            document.getElementById('deduction-reason').value = '';
+            saveToStorage(); render(); hideError();
+        });
+
+        document.getElementById('btn-save-candidates').addEventListener('click', function() {
+            state.candidates.males = document.getElementById('males-textarea').value.split('\n').map(function(s) { return s.trim(); }).filter(function(s) { return s.length > 0; });
+            state.candidates.females = document.getElementById('females-textarea').value.split('\n').map(function(s) { return s.trim(); }).filter(function(s) { return s.length > 0; });
+            state.candidates.inactive = document.getElementById('inactive-textarea').value.split('\n').map(function(s) { return s.trim(); }).filter(function(s) { return s.length > 0; }).map(function(line) { var parts = line.split(','); return { name: parts[0].trim(), gender: (parts[1] || 'male').trim() }; });
+            state.solverResult = null; saveToStorage(); render(); showStatus('Teilnehmer gespeichert', 'success');
+        });
+
+        document.getElementById('btn-activate-candidate').addEventListener('click', function() {
+            if (state.candidates.inactive.length === 0) { showError('Keine inaktiven Teilnehmer'); return; }
+            showModal('Nachzuegler aktivieren', '<select id="modal-inactive-select">' + state.candidates.inactive.map(function(p, i) { return '<option value="' + i + '">' + escapeHtml(p.name) + ' (' + p.gender + ')</option>'; }).join('') + '</select>', function() {
+                var idx = parseInt(document.getElementById('modal-inactive-select').value);
+                var person = state.candidates.inactive[idx];
+                if (person.gender === 'male') state.candidates.males.push(person.name);
+                else state.candidates.females.push(person.name);
+                state.candidates.inactive.splice(idx, 1);
+                state.solverResult = null; saveToStorage(); render();
+                document.getElementById('modal-overlay').classList.add('hidden');
+            });
+        });
+
+        document.getElementById('matchbox-result').addEventListener('change', function() {
+            var soldInput = document.getElementById('matchbox-sold-amount');
+            if (this.value === 'sold') soldInput.classList.remove('hidden');
+            else soldInput.classList.add('hidden');
+        });
+
+        document.getElementById('btn-add-matchbox').addEventListener('click', function() {
+            var male = document.getElementById('matchbox-male').value;
+            var female = document.getElementById('matchbox-female').value;
+            var result = document.getElementById('matchbox-result').value;
+            var episode = parseInt(document.getElementById('matchbox-episode').value) || 1;
+            var soldAmount = parseInt(document.getElementById('matchbox-sold-amount').value) || 0;
+            if (!male || !female) { showError('Mann und Frau waehlen'); return; }
+            if (!result) { showError('Ergebnis waehlen'); return; }
+            var entry = { id: generateId(), episode: episode, male: male, female: female, result: result };
+            if (result === 'sold' && soldAmount > 0) { entry.soldAmount = soldAmount; state.deductions.push({ id: generateId(), amount: soldAmount, reason: 'Matchbox verkauft (Ep. ' + episode + ')' }); }
+            state.truthBooth.push(entry); state.solverResult = null;
+            document.getElementById('matchbox-male').value = '';
+            document.getElementById('matchbox-female').value = '';
+            document.getElementById('matchbox-result').value = '';
+            document.getElementById('matchbox-episode').value = '';
+            document.getElementById('matchbox-sold-amount').value = '';
+            document.getElementById('matchbox-sold-amount').classList.add('hidden');
+            saveToStorage(); render(); hideError();
+        });
+
+        document.getElementById('btn-add-night').addEventListener('click', function() {
+            state.matchingNights.push({ id: generateId(), episode: state.matchingNights.length + 1, pairs: state.candidates.males.map(function() { return { male: '', female: '' }; }), lights: 0 });
+            saveToStorage(); render();
+        });
+
+        document.getElementById('btn-solve').addEventListener('click', function() {
+            var btn = this; btn.disabled = true; showStatus('Berechne...', 'running');
+            document.getElementById('solver-stats').classList.add('hidden');
+            setTimeout(function() {
+                try {
+                    var result = solve(); state.solverResult = result; saveToStorage(); render();
+                    if (result.error) showStatus(result.error, 'error');
+                    else showStatus('Berechnung abgeschlossen', 'success');
+                    document.getElementById('stat-solutions').textContent = result.solutionsCount.toLocaleString() + ' Loesungen';
+                    document.getElementById('stat-time').textContent = Math.round(result.runtime) + 'ms';
+                    document.getElementById('solver-stats').classList.remove('hidden');
+                } catch (e) { showStatus('Fehler: ' + e.message, 'error'); showError('Solver-Fehler: ' + e.message); }
+                btn.disabled = false;
+            }, 50);
+        });
+
+        document.getElementById('btn-reset').addEventListener('click', function() {
+            showModal('Alle Daten zuruecksetzen?', '<p>Dies loescht alles.</p>', function() {
+                state = { candidates: { males: DEFAULT_MALES.slice(), females: DEFAULT_FEMALES.slice(), inactive: DEFAULT_INACTIVE.slice() }, truthBooth: [], matchingNights: [], deductions: [], solverResult: null };
+                nextId = 1; saveToStorage(); render();
+                document.getElementById('modal-overlay').classList.add('hidden');
+                showStatus('Zurueckgesetzt', 'success');
+            });
+        });
+
+        document.addEventListener('click', function(e) {
+            if (e.target.matches('.btn-remove[data-type]')) {
+                var id = parseInt(e.target.dataset.id), type = e.target.dataset.type;
+                if (type === 'deduction') state.deductions = state.deductions.filter(function(d) { return d.id !== id; });
+                else if (type === 'truthBooth') { state.truthBooth = state.truthBooth.filter(function(t) { return t.id !== id; }); state.solverResult = null; }
+                else if (type === 'night') { state.matchingNights = state.matchingNights.filter(function(n) { return n.id !== id; }); state.solverResult = null; }
+                saveToStorage(); render();
+            }
+            if (e.target.matches('[data-action="add-pair"]')) {
+                var nightId = parseInt(e.target.dataset.night);
+                var night = state.matchingNights.find(function(n) { return n.id === nightId; });
+                if (night) { night.pairs.push({ male: '', female: '' }); saveToStorage(); render(); }
+            }
+            if (e.target.matches('.btn-remove-pair')) {
+                var nightId = parseInt(e.target.dataset.night), index = parseInt(e.target.dataset.index);
+                var night = state.matchingNights.find(function(n) { return n.id === nightId; });
+                if (night && night.pairs.length > 1) { night.pairs.splice(index, 1); state.solverResult = null; saveToStorage(); render(); }
+            }
+        });
+
+        document.addEventListener('change', function(e) {
+            if (e.target.matches('.night-pair select')) {
+                var nightId = parseInt(e.target.dataset.night), index = parseInt(e.target.dataset.index), type = e.target.dataset.type, value = e.target.value;
+                var night = state.matchingNights.find(function(n) { return n.id === nightId; });
+                if (night && night.pairs[index]) { night.pairs[index][type] = value; state.solverResult = null; saveToStorage(); render(); }
+            }
+            if (e.target.matches('[data-field="lights"]')) {
+                var nightId = parseInt(e.target.dataset.night), value = parseInt(e.target.value) || 0;
+                var night = state.matchingNights.find(function(n) { return n.id === nightId; });
+                if (night) { night.lights = Math.max(0, Math.min(value, state.candidates.males.length)); state.solverResult = null; saveToStorage(); render(); }
+            }
+        });
+    }
+
+    window.onerror = function(msg, url, line) { showError('JS-Fehler: ' + msg + ' (Zeile ' + line + ')'); return false; };
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function() { if (!loadFromStorage()) saveToStorage(); setup(); render(); });
+    else { if (!loadFromStorage()) saveToStorage(); setup(); render(); }
+})();
+</script>
+</body>
+</html>

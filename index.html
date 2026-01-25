@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1a1a2e">
+    <title>AYTO Solver - Staffel 7 (2026)</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌹</text></svg>">
+</head>
+<body>
+    <div id="app">
+        <header class="app-header">
+            <h1>Are You The One? Staffel 7</h1>
+            <div class="header-actions">
+                <button id="btn-export" class="btn btn-primary">Export</button>
+                <button id="btn-import" class="btn btn-secondary">Import</button>
+                <input type="file" id="import-file" accept=".json" hidden>
+            </div>
+        </header>
+
+        <main class="app-main">
+            <!-- Error Box -->
+            <div id="error-box" class="error-box hidden"></div>
+
+            <!-- Prize Pool Section -->
+            <section class="section" id="section-prize">
+                <div class="section-header" data-toggle="prize-content">
+                    <h2>Preisgeld</h2>
+                    <span class="prize-amount" id="prize-display">200.000 EUR</span>
+                    <span class="toggle-icon">-</span>
+                </div>
+                <div class="section-content" id="prize-content">
+                    <div class="deduction-form">
+                        <input type="number" id="deduction-amount" placeholder="Betrag" min="0" step="1000">
+                        <input type="text" id="deduction-reason" placeholder="Grund (z.B. Strafe Ep.3)">
+                        <button id="btn-add-deduction" class="btn btn-small">+ Abzug</button>
+                    </div>
+                    <ul id="deductions-list" class="item-list"></ul>
+                </div>
+            </section>
+
+            <!-- Candidates Section -->
+            <section class="section" id="section-candidates">
+                <div class="section-header" data-toggle="candidates-content">
+                    <h2>Teilnehmer</h2>
+                    <span class="toggle-icon">+</span>
+                </div>
+                <div class="section-content collapsed" id="candidates-content">
+                    <div class="candidates-edit">
+                        <div class="candidates-column">
+                            <label>Maenner (je Zeile einer):</label>
+                            <textarea id="males-textarea" rows="6"></textarea>
+                        </div>
+                        <div class="candidates-column">
+                            <label>Frauen (je Zeile eine):</label>
+                            <textarea id="females-textarea" rows="6"></textarea>
+                        </div>
+                    </div>
+                    <div class="candidates-inactive">
+                        <label>Inaktiv/Nachzuegler (Format: Name,male oder Name,female):</label>
+                        <textarea id="inactive-textarea" rows="3"></textarea>
+                    </div>
+                    <button id="btn-save-candidates" class="btn btn-primary">Teilnehmer speichern</button>
+                    <button id="btn-activate-candidate" class="btn btn-secondary">Nachzuegler aktivieren</button>
+                </div>
+            </section>
+
+            <!-- Truth Booth / Matchbox Section -->
+            <section class="section" id="section-matchbox">
+                <div class="section-header" data-toggle="matchbox-content">
+                    <h2>Matchbox</h2>
+                    <span class="badge" id="matchbox-count">0</span>
+                    <span class="toggle-icon">-</span>
+                </div>
+                <div class="section-content" id="matchbox-content">
+                    <div class="matchbox-form">
+                        <select id="matchbox-male"></select>
+                        <select id="matchbox-female"></select>
+                        <select id="matchbox-result">
+                            <option value="">Ergebnis...</option>
+                            <option value="perfect">Perfect Match</option>
+                            <option value="no">Kein Match</option>
+                            <option value="sold">Verkauft</option>
+                        </select>
+                        <input type="number" id="matchbox-sold-amount" placeholder="Verkaufspreis" min="0" step="1000" class="hidden">
+                        <input type="number" id="matchbox-episode" placeholder="Episode" min="1" max="20">
+                        <button id="btn-add-matchbox" class="btn btn-small">+ Matchbox</button>
+                    </div>
+                    <ul id="matchbox-list" class="item-list"></ul>
+                </div>
+            </section>
+
+            <!-- Matching Nights Section -->
+            <section class="section" id="section-nights">
+                <div class="section-header" data-toggle="nights-content">
+                    <h2>Matching Nights</h2>
+                    <span class="badge" id="nights-count">0</span>
+                    <span class="toggle-icon">-</span>
+                </div>
+                <div class="section-content" id="nights-content">
+                    <button id="btn-add-night" class="btn btn-primary">+ Neue Matching Night</button>
+                    <div id="nights-list" class="nights-container"></div>
+                </div>
+            </section>
+
+            <!-- Solver Section -->
+            <section class="section" id="section-solver">
+                <div class="section-header">
+                    <h2>Exakte Berechnung</h2>
+                </div>
+                <div class="section-content">
+                    <button id="btn-solve" class="btn btn-solve">Wahrscheinlichkeiten berechnen</button>
+                    <div id="solver-status" class="solver-status"></div>
+                    <div id="solver-stats" class="solver-stats hidden">
+                        <span id="stat-solutions">0 Loesungen</span>
+                        <span id="stat-time">0ms</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Perfect Matches Section -->
+            <section class="section" id="section-perfect">
+                <div class="section-header" data-toggle="perfect-content">
+                    <h2>Bestaetigte Perfect Matches</h2>
+                    <span class="badge" id="perfect-count">0</span>
+                    <span class="toggle-icon">-</span>
+                </div>
+                <div class="section-content" id="perfect-content">
+                    <ul id="perfect-list" class="item-list perfect-matches"></ul>
+                </div>
+            </section>
+
+            <!-- Probabilities Section -->
+            <section class="section" id="section-probabilities">
+                <div class="section-header" data-toggle="probabilities-content">
+                    <h2>Paar-Wahrscheinlichkeiten</h2>
+                    <span class="toggle-icon">-</span>
+                </div>
+                <div class="section-content" id="probabilities-content">
+                    <div id="probabilities-list" class="probabilities-container">
+                        <p class="hint">Druecke "Wahrscheinlichkeiten berechnen" um die Analyse zu starten.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Reset Section -->
+            <section class="section section-danger">
+                <button id="btn-reset" class="btn btn-danger">Alle Daten zuruecksetzen</button>
+            </section>
+        </main>
+
+        <footer class="app-footer">
+            <p>AYTO Solver v1.0 - Constraint-basierte exakte Berechnung</p>
+        </footer>
+    </div>
+
+    <!-- Modals -->
+    <div id="modal-overlay" class="modal-overlay hidden">
+        <div id="modal-content" class="modal-content">
+            <div id="modal-body"></div>
+            <div class="modal-actions">
+                <button id="modal-cancel" class="btn btn-secondary">Abbrechen</button>
+                <button id="modal-confirm" class="btn btn-primary">Bestaetigen</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        // Register Service Worker for offline support
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(function(reg) {
+                        console.log('Service Worker registered:', reg.scope);
+                    })
+                    .catch(function(err) {
+                        console.log('Service Worker registration failed:', err);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>
