@@ -1,4 +1,4 @@
-// AYTO Solver - Are You The One? VIP Staffel 5
+// AYTO Solver - Are You The One? Staffel 7 (2026)
 // Constraint-based exact probability calculator
 
 (function() {
@@ -11,23 +11,21 @@
     const CONFIG = {
         INITIAL_PRIZE: 200000,
         SOLVER_TIME_LIMIT: 5000, // 5 seconds
-        STORAGE_KEY: 'ayto_solver_state',
-        VERSION: '1.0'
+        STORAGE_KEY: 'ayto_solver_state_s7',
+        VERSION: '1.1'
     };
 
     const DEFAULT_MALES = [
-        'Calvin O.', 'Calvin S.', 'Jonny', 'Kevin', 'Leandro',
-        'Lennert', 'Nico', 'Olli', 'Rob', 'Sidar', 'Xander'
+        'Chris', 'Ema', 'Evi', 'Jeronymo', 'Jerry',
+        'Julian M.', 'Julian S.', 'Luke', 'Meji', 'Noel'
     ];
 
     const DEFAULT_FEMALES = [
-        'Antonia', 'Ariel', 'Beverly', 'Elli', 'Hati',
-        'Henna', 'Joanna', 'Nelly', 'Sandra Janina', 'Viki'
+        'Adrianna', 'Alicia', 'Aurora', 'Elena', 'Ella',
+        'Laura', 'Linda', 'Marla', 'Michelle', 'Tiziana', 'Tonia'
     ];
 
-    const DEFAULT_INACTIVE = [
-        { name: 'Jimi Blue', gender: 'male' }
-    ];
+    const DEFAULT_INACTIVE = [];
 
     // ============================================
     // STATE MANAGEMENT
