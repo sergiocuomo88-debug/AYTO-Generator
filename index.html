@@ -3,758 +3,570 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>Cosmic Jumper 🚀</title>
+  <title>AYTO Games • Ultimate Mobile Games</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
+    :root {
+      --primary: #a78bfa;
+      --secondary: #7c3aed;
+      --accent: #60a5fa;
+      --danger: #f43f5e;
+      --gold: #facc15;
+      --bg-dark: #0a0a1a;
+      --bg-darker: #050510;
+      --text-light: #f0f0ff;
+    }
+
     body {
-      background: #0a0a1a;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100dvh;
+      background: linear-gradient(135deg, var(--bg-dark), var(--bg-darker));
+      color: var(--text-light);
       font-family: 'Segoe UI', sans-serif;
-      overflow: hidden;
-      touch-action: none;
+      overflow-x: hidden;
+      min-height: 100dvh;
     }
 
-    #gameWrapper {
-      position: relative;
-      width: min(100vw, 420px);
-      height: min(100dvh, 740px);
-    }
-
-    canvas {
-      width: 100%;
-      height: 100%;
-      display: block;
-      border-radius: 12px;
-    }
-
-    #ui {
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      padding: 16px 20px;
+    /* ─── NAVBAR ─── */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(10, 10, 26, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 12px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      pointer-events: none;
     }
 
-    .score-box {
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.2);
-      border-radius: 12px;
-      padding: 6px 14px;
-      color: #fff;
-      font-size: 14px;
-      font-weight: 600;
-      backdrop-filter: blur(4px);
-    }
-
-    .score-box span {
-      font-size: 20px;
-      color: #a78bfa;
-    }
-
-    #overlay {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: rgba(10,10,26,0.85);
-      border-radius: 12px;
-      color: #fff;
-      text-align: center;
-      padding: 24px;
-      gap: 16px;
-    }
-
-    #overlay h1 {
-      font-size: 2.4rem;
-      background: linear-gradient(135deg, #a78bfa, #60a5fa);
+    .navbar h1 {
+      font-size: 1.4rem;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
+      letter-spacing: 1px;
     }
 
-    #overlay p {
-      color: rgba(255,255,255,0.7);
-      font-size: 1rem;
-      line-height: 1.5;
-      max-width: 280px;
+    .nav-links {
+      display: flex;
+      gap: 12px;
     }
 
-    #overlay .final-score {
-      font-size: 1.2rem;
-      color: #a78bfa;
+    .nav-links a {
+      color: var(--text-light);
+      text-decoration: none;
+      font-size: 0.9rem;
+      padding: 8px 16px;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+
+    .nav-links a:hover {
+      background: rgba(167, 139, 250, 0.1);
+      color: var(--primary);
+    }
+
+    /* ─── HERO ─── */
+    .hero {
+      padding: 60px 20px;
+      text-align: center;
+      background: radial-gradient(ellipse at center, rgba(167, 139, 250, 0.1) 0%, transparent 70%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(167, 139, 250, 0.05) 1px, transparent 1px);
+      background-size: 50px 50px;
+      animation: drift 20s linear infinite;
+    }
+
+    @keyframes drift {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(50px, 50px); }
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero h1 {
+      font-size: clamp(2rem, 8vw, 4rem);
+      line-height: 1.2;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, var(--primary), var(--accent), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -1px;
+    }
+
+    .hero p {
+      font-size: 1.1rem;
+      color: rgba(255, 255, 255, 0.7);
+      max-width: 500px;
+      margin: 0 auto 32px;
+      line-height: 1.6;
+    }
+
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-num {
+      font-size: 2rem;
       font-weight: 700;
+      color: var(--primary);
     }
 
-    #startBtn {
-      margin-top: 8px;
-      background: linear-gradient(135deg, #7c3aed, #2563eb);
+    .stat-label {
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.5);
+      margin-top: 4px;
+    }
+
+    /* ─── GAMES GRID ─── */
+    .games-section {
+      padding: 60px 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-title {
+      font-size: 2rem;
+      margin-bottom: 40px;
+      text-align: center;
+      color: var(--primary);
+    }
+
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      margin-bottom: 60px;
+    }
+
+    .game-card {
+      background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(96, 165, 250, 0.05));
+      border: 1px solid rgba(167, 139, 250, 0.2);
+      border-radius: 16px;
+      padding: 24px;
+      transition: all 0.3s;
+      cursor: pointer;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .game-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      transition: left 0.5s;
+    }
+
+    .game-card:hover::before {
+      left: 100%;
+    }
+
+    .game-card:hover {
+      transform: translateY(-8px);
+      border-color: rgba(167, 139, 250, 0.4);
+      background: linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(96, 165, 250, 0.1));
+      box-shadow: 0 20px 60px rgba(167, 139, 250, 0.15);
+    }
+
+    .game-icon {
+      font-size: 3rem;
+      margin-bottom: 12px;
+    }
+
+    .game-card h3 {
+      font-size: 1.4rem;
+      margin-bottom: 8px;
+      color: var(--primary);
+    }
+
+    .game-card p {
+      color: rgba(255, 255, 255, 0.6);
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+
+    .game-features {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .game-features li {
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .game-features li::before {
+      content: '✓';
+      color: var(--gold);
+      font-weight: bold;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 12px 28px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
       border: none;
       border-radius: 50px;
-      color: #fff;
-      font-size: 1.1rem;
-      font-weight: 700;
-      padding: 14px 40px;
+      font-size: 1rem;
+      font-weight: 600;
       cursor: pointer;
-      box-shadow: 0 8px 32px rgba(124,58,237,0.5);
-      transition: transform 0.1s, box-shadow 0.1s;
+      transition: all 0.3s;
+      text-decoration: none;
+      text-align: center;
+      box-shadow: 0 8px 24px rgba(167, 139, 250, 0.3);
       letter-spacing: 0.5px;
     }
 
-    #startBtn:active { transform: scale(0.96); }
-
-    .hint {
-      font-size: 0.82rem;
-      color: rgba(255,255,255,0.4);
-      margin-top: -4px;
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(167, 139, 250, 0.4);
     }
 
-    #comboFlash {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      color: #facc15;
-      font-size: 1.5rem;
-      font-weight: 900;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.1s;
-      text-shadow: 0 0 20px #facc15;
+    .btn:active {
+      transform: translateY(0);
     }
+
+    /* ─── LEADERBOARD ─── */
+    .leaderboard-section {
+      padding: 60px 20px;
+      background: rgba(124, 58, 237, 0.05);
+    }
+
+    .leaderboard-container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .leaderboard-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+
+    .leaderboard-table th {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 2px solid rgba(167, 139, 250, 0.2);
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .leaderboard-table td {
+      padding: 12px;
+      border-bottom: 1px solid rgba(167, 139, 250, 0.1);
+    }
+
+    .rank {
+      font-weight: 700;
+      color: var(--primary);
+      min-width: 30px;
+    }
+
+    .rank.gold { color: var(--gold); }
+    .rank.silver { color: #c0c0c0; }
+    .rank.bronze { color: #cd7f32; }
+
+    .leaderboard-empty {
+      text-align: center;
+      padding: 40px 20px;
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    /* ─── FOOTER ─── */
+    .footer {
+      padding: 40px 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      text-align: center;
+      color: rgba(255, 255, 255, 0.4);
+      font-size: 0.9rem;
+    }
+
+    .footer a {
+      color: var(--primary);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer a:hover {
+      color: var(--accent);
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 600px) {
+      .navbar h1 {
+        font-size: 1.1rem;
+      }
+
+      .nav-links a {
+        font-size: 0.8rem;
+        padding: 6px 12px;
+      }
+
+      .hero {
+        padding: 40px 16px;
+      }
+
+      .hero h1 {
+        font-size: 1.8rem;
+      }
+
+      .hero-stats {
+        gap: 20px;
+      }
+
+      .games-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+    }
+
+    /* ─── ANIMATIONS ─── */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .game-card {
+      animation: fadeIn 0.6s ease-out forwards;
+    }
+
+    .game-card:nth-child(1) { animation-delay: 0.1s; }
+    .game-card:nth-child(2) { animation-delay: 0.2s; }
+    .game-card:nth-child(3) { animation-delay: 0.3s; }
   </style>
 </head>
 <body>
 
-<div id="gameWrapper">
-  <canvas id="canvas"></canvas>
-
-  <div id="ui">
-    <div class="score-box">Score<br><span id="scoreDisplay">0</span></div>
-    <div class="score-box">Best<br><span id="bestDisplay">0</span></div>
-    <div class="score-box">x<span id="speedDisplay">1</span></div>
-  </div>
-
-  <div id="comboFlash"></div>
-
-  <div id="overlay">
-    <h1>🚀 Cosmic<br>Jumper</h1>
-    <p>Tippe oder drücke <strong>Leertaste</strong> um zu springen.<br>Doppeltippe für einen Doppelsprung!</p>
-    <button id="startBtn">STARTEN</button>
-    <span class="hint">Touchscreen & Keyboard</span>
+<div class="navbar">
+  <h1>🎮 AYTO Games</h1>
+  <div class="nav-links">
+    <a href="#games">Games</a>
+    <a href="#leaderboard">Leaderboard</a>
   </div>
 </div>
 
+<!-- HERO SECTION -->
+<section class="hero">
+  <div class="hero-content">
+    <h1>Ultimate Mobile Gaming 🚀</h1>
+    <p>Meistern Sie unsere atemberaubenden Arcade-Spiele und kämpfen Sie um den Platz auf dem globalen Leaderboard</p>
+
+    <div class="hero-stats">
+      <div class="stat">
+        <div class="stat-num" id="totalPlayers">0</div>
+        <div class="stat-label">Spieler</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num" id="totalGames">2</div>
+        <div class="stat-label">Spiele</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num" id="globalRecord">0</div>
+        <div class="stat-label">Top Score</div>
+      </div>
+    </div>
+
+    <a href="#games" class="btn">Jetzt spielen</a>
+  </div>
+</section>
+
+<!-- GAMES SECTION -->
+<section class="games-section" id="games">
+  <h2 class="section-title">Unsere Spiele</h2>
+
+  <div class="games-grid">
+    <!-- COSMIC JUMPER -->
+    <div class="game-card">
+      <div class="game-icon">🚀</div>
+      <h3>Cosmic Jumper</h3>
+      <p>Springe über Hindernisse, sammle Münzen und aktiviere Schilder!</p>
+
+      <ul class="game-features">
+        <li>Endloses Gameplay</li>
+        <li>Doppelsprünge verfügbar</li>
+        <li>Power-Ups & Münzen</li>
+        <li>Schwierigkeitsgradfiegschwelle</li>
+      </ul>
+
+      <a href="cosmic-jumper.html" class="btn" style="width: 100%;">SPIELEN</a>
+    </div>
+
+    <!-- FLUGSIMULATOR -->
+    <div class="game-card">
+      <div class="game-icon">✈️</div>
+      <h3>Flugsimulator</h3>
+      <p>Fliege durch Ringe und weiche Hindernissen aus!</p>
+
+      <ul class="game-features">
+        <li>3D-ähnliche Grafik</li>
+        <li>Diverse Hindernisse</li>
+        <li>Ring-Challenge</li>
+        <li>Responsive Controls</li>
+      </ul>
+
+      <a href="flugsimulator/index.html" class="btn" style="width: 100%;">SPIELEN</a>
+    </div>
+  </div>
+</section>
+
+<!-- LEADERBOARD SECTION -->
+<section class="leaderboard-section" id="leaderboard">
+  <div class="leaderboard-container">
+    <h2 class="section-title">🏆 Global Leaderboard</h2>
+
+    <div style="margin-bottom: 40px;">
+      <h3 style="color: var(--primary); margin-bottom: 16px;">Cosmic Jumper Top 10</h3>
+      <table class="leaderboard-table">
+        <thead>
+          <tr>
+            <th>Rang</th>
+            <th>Spieler</th>
+            <th>Score</th>
+          </tr>
+        </thead>
+        <tbody id="cosmicLeaderboard">
+          <tr>
+            <td colspan="3" class="leaderboard-empty">Noch keine Scores... Spielen Sie jetzt!</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div>
+      <h3 style="color: var(--primary); margin-bottom: 16px;">Flugsimulator Top 10</h3>
+      <table class="leaderboard-table">
+        <thead>
+          <tr>
+            <th>Rang</th>
+            <th>Spieler</th>
+            <th>Score</th>
+          </tr>
+        </thead>
+        <tbody id="flugLeaderboard">
+          <tr>
+            <td colspan="3" class="leaderboard-empty">Noch keine Scores... Spielen Sie jetzt!</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <p>🎮 AYTO Games © 2026 • Made with ❤️ • <a href="#">Datenschutz</a></p>
+</footer>
+
 <script>
-const canvas = document.getElementById('canvas');
-const ctx    = canvas.getContext('2d');
-const overlay        = document.getElementById('overlay');
-const scoreDisplay   = document.getElementById('scoreDisplay');
-const bestDisplay    = document.getElementById('bestDisplay');
-const speedDisplay   = document.getElementById('speedDisplay');
-const startBtn       = document.getElementById('startBtn');
-const comboFlash     = document.getElementById('comboFlash');
+// ─── LEADERBOARD MANAGEMENT ───
+const STORAGE_KEY = 'ayto_games_leaderboard';
 
-// ── Canvas size ──────────────────────────────────────────────────────────────
-function resize() {
-  const wrap = canvas.parentElement;
-  canvas.width  = wrap.clientWidth;
-  canvas.height = wrap.clientHeight;
-}
-resize();
-window.addEventListener('resize', resize);
-
-// ── Stars background ─────────────────────────────────────────────────────────
-const STAR_COUNT = 120;
-const stars = Array.from({length: STAR_COUNT}, () => ({
-  x: Math.random(), y: Math.random(),
-  r: Math.random() * 1.5 + 0.3,
-  speed: Math.random() * 0.3 + 0.05,
-  alpha: Math.random() * 0.8 + 0.2,
-}));
-
-function drawStars(speed) {
-  stars.forEach(s => {
-    s.x -= s.speed * speed * 0.0005;
-    if (s.x < 0) { s.x = 1; s.y = Math.random(); }
-    ctx.save();
-    ctx.globalAlpha = s.alpha;
-    ctx.fillStyle = '#fff';
-    ctx.beginPath();
-    ctx.arc(s.x * canvas.width, s.y * canvas.height, s.r, 0, Math.PI*2);
-    ctx.fill();
-    ctx.restore();
-  });
-}
-
-// ── Particles ────────────────────────────────────────────────────────────────
-const particles = [];
-
-function spawnParticles(x, y, color, count=8) {
-  for (let i = 0; i < count; i++) {
-    const angle = (Math.PI * 2 * i) / count + Math.random() * 0.5;
-    const speed = Math.random() * 4 + 1;
-    particles.push({
-      x, y,
-      vx: Math.cos(angle) * speed,
-      vy: Math.sin(angle) * speed,
-      r: Math.random() * 5 + 2,
-      alpha: 1,
-      color,
-    });
+function initLeaderboard() {
+  if (!localStorage.getItem(STORAGE_KEY)) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      cosmic: [],
+      flug: []
+    }));
   }
 }
 
-function updateParticles() {
-  for (let i = particles.length - 1; i >= 0; i--) {
-    const p = particles[i];
-    p.x += p.vx; p.y += p.vy;
-    p.vy += 0.15;
-    p.alpha -= 0.035;
-    p.r *= 0.97;
-    if (p.alpha <= 0) particles.splice(i, 1);
-  }
+function addScore(game, playerName, score) {
+  const data = JSON.parse(localStorage.getItem(STORAGE_KEY));
+  const key = game === 'cosmic' ? 'cosmic' : 'flug';
+
+  data[key].push({ name: playerName, score, date: new Date().toISOString() });
+  data[key].sort((a, b) => b.score - a.score);
+  data[key] = data[key].slice(0, 100); // Keep top 100
+
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  renderLeaderboards();
 }
 
-function drawParticles() {
-  particles.forEach(p => {
-    ctx.save();
-    ctx.globalAlpha = p.alpha;
-    ctx.fillStyle = p.color;
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-    ctx.fill();
-    ctx.restore();
-  });
-}
+function renderLeaderboards() {
+  const data = JSON.parse(localStorage.getItem(STORAGE_KEY));
 
-// ── Game state ───────────────────────────────────────────────────────────────
-let state = 'idle'; // idle | running | dead
-let score, best, gameSpeed, groundY, jumpCount, jumpsAllowed;
-let obstacles, coins, powerups;
-let frameCount, comboTimeout;
-let playerY, playerVY, playerOnGround;
-let shieldActive, shieldTimer;
-let flashAlpha = 0;
-
-const GRAVITY      = 0.55;
-const JUMP_FORCE   = -13;
-const PLAYER_X     = 80;
-const PLAYER_W     = 36;
-const PLAYER_H     = 44;
-const GROUND_FRAC  = 0.78;
-
-function initGame() {
-  score        = 0;
-  gameSpeed    = 5;
-  frameCount   = 0;
-  obstacles    = [];
-  coins        = [];
-  powerups     = [];
-  particles.length = 0;
-  jumpCount    = 0;
-  jumpsAllowed = 2;
-  shieldActive = false;
-  shieldTimer  = 0;
-  flashAlpha   = 0;
-  groundY      = canvas.height * GROUND_FRAC;
-  playerY      = groundY - PLAYER_H;
-  playerVY     = 0;
-  playerOnGround = true;
-}
-
-// ── Player ───────────────────────────────────────────────────────────────────
-function drawPlayer() {
-  const x = PLAYER_X, y = playerY, w = PLAYER_W, h = PLAYER_H;
-
-  // Shield glow
-  if (shieldActive) {
-    ctx.save();
-    ctx.shadowColor = '#60a5fa';
-    ctx.shadowBlur = 20;
-    ctx.strokeStyle = 'rgba(96,165,250,0.6)';
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.ellipse(x + w/2, y + h/2, w * 0.9, h * 0.8, 0, 0, Math.PI*2);
-    ctx.stroke();
-    ctx.restore();
-  }
-
-  // Body gradient
-  const grad = ctx.createLinearGradient(x, y, x + w, y + h);
-  grad.addColorStop(0, '#a78bfa');
-  grad.addColorStop(1, '#7c3aed');
-  ctx.fillStyle = grad;
-  ctx.beginPath();
-  ctx.roundRect(x, y, w, h, 8);
-  ctx.fill();
-
-  // Visor
-  ctx.fillStyle = 'rgba(96,165,250,0.8)';
-  ctx.beginPath();
-  ctx.roundRect(x + 6, y + 8, w - 12, 14, 5);
-  ctx.fill();
-
-  // Legs animation
-  const legOff = playerOnGround ? Math.sin(frameCount * 0.3) * 4 : 0;
-  ctx.fillStyle = '#6d28d9';
-  ctx.fillRect(x + 5, y + h - 10, 10, 10 + legOff);
-  ctx.fillRect(x + w - 15, y + h - 10, 10, 10 - legOff);
-
-  // Thruster fire when jumping
-  if (!playerOnGround) {
-    const fireGrad = ctx.createLinearGradient(x + w/2, y + h, x + w/2, y + h + 20);
-    fireGrad.addColorStop(0, '#f97316');
-    fireGrad.addColorStop(1, 'transparent');
-    ctx.fillStyle = fireGrad;
-    ctx.beginPath();
-    ctx.moveTo(x + 10, y + h);
-    ctx.lineTo(x + w - 10, y + h);
-    ctx.lineTo(x + w/2, y + h + 18 + Math.random()*6);
-    ctx.fill();
-  }
-}
-
-function updatePlayer() {
-  playerVY += GRAVITY;
-  playerY  += playerVY;
-  groundY   = canvas.height * GROUND_FRAC;
-
-  if (playerY + PLAYER_H >= groundY) {
-    playerY = groundY - PLAYER_H;
-    playerVY = 0;
-    playerOnGround = true;
-    jumpCount = 0;
+  // Cosmic Jumper
+  const cosmicTable = document.getElementById('cosmicLeaderboard');
+  if (data.cosmic.length === 0) {
+    cosmicTable.innerHTML = '<tr><td colspan="3" class="leaderboard-empty">Noch keine Scores...</td></tr>';
   } else {
-    playerOnGround = false;
+    cosmicTable.innerHTML = data.cosmic.slice(0, 10).map((entry, idx) => `
+      <tr>
+        <td class="rank ${idx === 0 ? 'gold' : idx === 1 ? 'silver' : idx === 2 ? 'bronze' : ''}">
+          ${idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : idx + 1}
+        </td>
+        <td>${entry.name}</td>
+        <td>${entry.score}</td>
+      </tr>
+    `).join('');
   }
-}
 
-function jump() {
-  if (state !== 'running') return;
-  if (jumpCount < jumpsAllowed) {
-    playerVY = JUMP_FORCE * (jumpCount === 1 ? 0.85 : 1);
-    jumpCount++;
-    playerOnGround = false;
-    spawnParticles(PLAYER_X + PLAYER_W/2, playerY + PLAYER_H, '#a78bfa', 6);
-  }
-}
-
-// ── Obstacles ────────────────────────────────────────────────────────────────
-const OBS_SHAPES = ['rock', 'spike', 'laser'];
-
-function spawnObstacle() {
-  const groundY = canvas.height * GROUND_FRAC;
-  const type  = OBS_SHAPES[Math.floor(Math.random() * OBS_SHAPES.length)];
-  const tall  = Math.random() < 0.3 && score > 20;
-  const h     = tall ? 70 + Math.random() * 30 : 35 + Math.random() * 25;
-  const w     = type === 'laser' ? 18 : 30 + Math.random() * 20;
-  obstacles.push({
-    x: canvas.width + 40,
-    y: groundY - h,
-    w, h, type,
-    color: type === 'laser' ? '#f43f5e' : type === 'spike' ? '#94a3b8' : '#475569',
-    passed: false,
-  });
-}
-
-function drawObstacle(o) {
-  ctx.save();
-  if (o.type === 'laser') {
-    // Laser pillar with glow
-    ctx.shadowColor = '#f43f5e';
-    ctx.shadowBlur = 12;
-    const g = ctx.createLinearGradient(o.x, o.y, o.x + o.w, o.y + o.h);
-    g.addColorStop(0, '#fda4af');
-    g.addColorStop(1, '#be123c');
-    ctx.fillStyle = g;
-    ctx.beginPath();
-    ctx.roundRect(o.x, o.y, o.w, o.h, 4);
-    ctx.fill();
-    // Pulse ring
-    ctx.globalAlpha = 0.3 + 0.3 * Math.sin(frameCount * 0.2);
-    ctx.strokeStyle = '#f43f5e';
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.roundRect(o.x - 4, o.y - 4, o.w + 8, o.h + 8, 6);
-    ctx.stroke();
-
-  } else if (o.type === 'spike') {
-    const g = ctx.createLinearGradient(o.x, o.y, o.x + o.w, o.y + o.h);
-    g.addColorStop(0, '#cbd5e1');
-    g.addColorStop(1, '#334155');
-    ctx.fillStyle = g;
-    // Body
-    ctx.fillRect(o.x, o.y + o.h * 0.3, o.w, o.h * 0.7);
-    // Spikes
-    const spikes = 3;
-    const sw = o.w / spikes;
-    for (let i = 0; i < spikes; i++) {
-      ctx.beginPath();
-      ctx.moveTo(o.x + i * sw, o.y + o.h * 0.3);
-      ctx.lineTo(o.x + i * sw + sw / 2, o.y);
-      ctx.lineTo(o.x + i * sw + sw, o.y + o.h * 0.3);
-      ctx.fill();
-    }
-
+  // Flugsimulator
+  const flugTable = document.getElementById('flugLeaderboard');
+  if (data.flug.length === 0) {
+    flugTable.innerHTML = '<tr><td colspan="3" class="leaderboard-empty">Noch keine Scores...</td></tr>';
   } else {
-    // Rock
-    ctx.shadowColor = 'rgba(0,0,0,0.4)';
-    ctx.shadowBlur = 8;
-    const g = ctx.createLinearGradient(o.x, o.y, o.x + o.w, o.y + o.h);
-    g.addColorStop(0, '#64748b');
-    g.addColorStop(1, '#1e293b');
-    ctx.fillStyle = g;
-    ctx.beginPath();
-    ctx.roundRect(o.x, o.y + 8, o.w, o.h - 8, [6, 6, 0, 0]);
-    ctx.fill();
-    // Shine
-    ctx.fillStyle = 'rgba(255,255,255,0.1)';
-    ctx.beginPath();
-    ctx.ellipse(o.x + o.w * 0.3, o.y + 14, o.w * 0.2, 6, -0.3, 0, Math.PI * 2);
-    ctx.fill();
-  }
-  ctx.restore();
-}
-
-// ── Coins ────────────────────────────────────────────────────────────────────
-function spawnCoin() {
-  const groundY = canvas.height * GROUND_FRAC;
-  const high = Math.random() < 0.4;
-  coins.push({
-    x: canvas.width + 20,
-    y: high ? groundY - PLAYER_H - 60 - Math.random() * 40 : groundY - PLAYER_H - Math.random() * 20,
-    r: 10,
-    collected: false,
-    spin: 0,
-  });
-}
-
-function drawCoin(c) {
-  c.spin += 0.07;
-  ctx.save();
-  ctx.shadowColor = '#facc15';
-  ctx.shadowBlur = 10;
-  const scaleX = Math.abs(Math.cos(c.spin));
-  ctx.translate(c.x, c.y);
-  ctx.scale(scaleX, 1);
-  const g = ctx.createRadialGradient(0, -2, 1, 0, 0, c.r);
-  g.addColorStop(0, '#fef08a');
-  g.addColorStop(1, '#ca8a04');
-  ctx.fillStyle = g;
-  ctx.beginPath();
-  ctx.arc(0, 0, c.r, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = '#fef9c3';
-  ctx.font = `bold ${c.r}px sans-serif`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('★', 0, 1);
-  ctx.restore();
-}
-
-// ── Power-ups ────────────────────────────────────────────────────────────────
-function spawnPowerup() {
-  const groundY = canvas.height * GROUND_FRAC;
-  powerups.push({
-    x: canvas.width + 20,
-    y: groundY - PLAYER_H - 30,
-    r: 14,
-    type: 'shield',
-    collected: false,
-    pulse: 0,
-  });
-}
-
-function drawPowerup(p) {
-  p.pulse += 0.08;
-  ctx.save();
-  ctx.shadowColor = '#60a5fa';
-  ctx.shadowBlur = 15 + 5 * Math.sin(p.pulse);
-  const g = ctx.createRadialGradient(p.x, p.y, 1, p.x, p.y, p.r);
-  g.addColorStop(0, '#bfdbfe');
-  g.addColorStop(1, '#1d4ed8');
-  ctx.fillStyle = g;
-  ctx.beginPath();
-  ctx.arc(p.x, p.y, p.r + 2 * Math.sin(p.pulse), 0, Math.PI*2);
-  ctx.fill();
-  ctx.fillStyle = '#fff';
-  ctx.font = `${p.r}px sans-serif`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('🛡️', p.x, p.y + 1);
-  ctx.restore();
-}
-
-// ── Ground ───────────────────────────────────────────────────────────────────
-let groundOffset = 0;
-
-function drawGround() {
-  const gY = canvas.height * GROUND_FRAC;
-  groundOffset = (groundOffset + gameSpeed) % 40;
-
-  const grad = ctx.createLinearGradient(0, gY, 0, canvas.height);
-  grad.addColorStop(0, '#1e293b');
-  grad.addColorStop(1, '#0f172a');
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, gY, canvas.width, canvas.height - gY);
-
-  // Grid lines
-  ctx.strokeStyle = 'rgba(99,102,241,0.25)';
-  ctx.lineWidth = 1;
-  for (let x = -groundOffset; x < canvas.width; x += 40) {
-    ctx.beginPath();
-    ctx.moveTo(x, gY);
-    ctx.lineTo(x, canvas.height);
-    ctx.stroke();
-  }
-  // Top border glow
-  ctx.shadowColor = '#818cf8';
-  ctx.shadowBlur = 8;
-  ctx.strokeStyle = '#6366f1';
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(0, gY);
-  ctx.lineTo(canvas.width, gY);
-  ctx.stroke();
-  ctx.shadowBlur = 0;
-}
-
-// ── Background ───────────────────────────────────────────────────────────────
-function drawBackground() {
-  const grad = ctx.createLinearGradient(0, 0, 0, canvas.height * GROUND_FRAC);
-  grad.addColorStop(0, '#0a0a1a');
-  grad.addColorStop(1, '#0f0f2e');
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, canvas.width, canvas.height * GROUND_FRAC);
-}
-
-// ── Collision ────────────────────────────────────────────────────────────────
-function rectsOverlap(ax, ay, aw, ah, bx, by, bw, bh) {
-  const pad = 6;
-  return ax + pad < bx + bw &&
-         ax + aw - pad > bx &&
-         ay + pad < by + bh &&
-         ay + ah - pad > by;
-}
-
-function circleRect(cx, cy, cr, rx, ry, rw, rh) {
-  const nearX = Math.max(rx, Math.min(cx, rx + rw));
-  const nearY = Math.max(ry, Math.min(cy, ry + rh));
-  const dx = cx - nearX, dy = cy - nearY;
-  return dx*dx + dy*dy < cr*cr;
-}
-
-// ── Flash ────────────────────────────────────────────────────────────────────
-function triggerFlash(color) {
-  flashAlpha = 0.45;
-  flashColor = color;
-}
-let flashColor = '#f43f5e';
-
-function drawFlash() {
-  if (flashAlpha <= 0) return;
-  ctx.save();
-  ctx.globalAlpha = flashAlpha;
-  ctx.fillStyle = flashColor;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.restore();
-  flashAlpha = Math.max(0, flashAlpha - 0.04);
-}
-
-// ── Combo flash ──────────────────────────────────────────────────────────────
-let comboVisible = false;
-function showCombo(text) {
-  comboFlash.textContent = text;
-  comboFlash.style.opacity = '1';
-  clearTimeout(comboTimeout);
-  comboTimeout = setTimeout(() => { comboFlash.style.opacity = '0'; }, 600);
-}
-
-// ── HUD ──────────────────────────────────────────────────────────────────────
-function updateHUD() {
-  scoreDisplay.textContent = score;
-  bestDisplay.textContent  = best || 0;
-  speedDisplay.textContent = (gameSpeed / 5).toFixed(1);
-}
-
-// ── Main loop ────────────────────────────────────────────────────────────────
-let lastObs = 0, lastCoin = 0, lastPowerup = 0;
-let animId;
-
-function loop() {
-  animId = requestAnimationFrame(loop);
-  frameCount++;
-
-  // Speed ramp
-  gameSpeed = 5 + score * 0.04;
-
-  // Spawning
-  const obsGap = Math.max(60, 100 - score * 0.3);
-  if (frameCount - lastObs > obsGap) {
-    spawnObstacle();
-    lastObs = frameCount;
-  }
-  if (frameCount - lastCoin > 40) {
-    if (Math.random() < 0.6) spawnCoin();
-    lastCoin = frameCount;
-  }
-  if (frameCount - lastPowerup > 300 && Math.random() < 0.008) {
-    spawnPowerup();
-    lastPowerup = frameCount;
+    flugTable.innerHTML = data.flug.slice(0, 10).map((entry, idx) => `
+      <tr>
+        <td class="rank ${idx === 0 ? 'gold' : idx === 1 ? 'silver' : idx === 2 ? 'bronze' : ''}">
+          ${idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : idx + 1}
+        </td>
+        <td>${entry.name}</td>
+        <td>${entry.score}</td>
+      </tr>
+    `).join('');
   }
 
-  updatePlayer();
-  updateParticles();
-
-  // Move obstacles & check collision
-  for (let i = obstacles.length - 1; i >= 0; i--) {
-    const o = obstacles[i];
-    o.x -= gameSpeed;
-    if (o.x + o.w < 0) { obstacles.splice(i, 1); continue; }
-
-    if (!o.passed && o.x + o.w < PLAYER_X) {
-      o.passed = true;
-      score++;
-      updateHUD();
-      if (score % 5 === 0) showCombo(`🎯 ${score} Punkte!`);
-    }
-
-    if (rectsOverlap(PLAYER_X, playerY, PLAYER_W, PLAYER_H, o.x, o.y, o.w, o.h)) {
-      if (shieldActive) {
-        shieldActive = false;
-        obstacles.splice(i, 1);
-        triggerFlash('#60a5fa');
-        spawnParticles(PLAYER_X + PLAYER_W/2, playerY + PLAYER_H/2, '#60a5fa', 12);
-        showCombo('🛡️ Schild!');
-      } else {
-        die();
-        return;
-      }
-    }
-  }
-
-  // Move coins
-  for (let i = coins.length - 1; i >= 0; i--) {
-    const c = coins[i];
-    c.x -= gameSpeed;
-    if (c.x + c.r < 0) { coins.splice(i, 1); continue; }
-    const px = PLAYER_X + PLAYER_W/2, py = playerY + PLAYER_H/2;
-    if (Math.hypot(px - c.x, py - c.y) < c.r + PLAYER_W/2 + 4) {
-      score += 2;
-      updateHUD();
-      spawnParticles(c.x, c.y, '#facc15', 6);
-      coins.splice(i, 1);
-    }
-  }
-
-  // Move power-ups
-  for (let i = powerups.length - 1; i >= 0; i--) {
-    const p = powerups[i];
-    p.x -= gameSpeed;
-    if (p.x + p.r < 0) { powerups.splice(i, 1); continue; }
-    const px = PLAYER_X + PLAYER_W/2, py = playerY + PLAYER_H/2;
-    if (Math.hypot(px - p.x, py - p.y) < p.r + PLAYER_W/2 + 4) {
-      shieldActive = true;
-      shieldTimer  = 300;
-      spawnParticles(p.x, p.y, '#60a5fa', 10);
-      triggerFlash('#60a5fa');
-      showCombo('🛡️ Schild aktiv!');
-      powerups.splice(i, 1);
-    }
-  }
-
-  if (shieldActive) {
-    shieldTimer--;
-    if (shieldTimer <= 0) shieldActive = false;
-  }
-
-  // Draw
-  drawBackground();
-  drawStars(gameSpeed);
-  drawGround();
-  obstacles.forEach(drawObstacle);
-  coins.forEach(drawCoin);
-  powerups.forEach(drawPowerup);
-  drawParticles();
-  drawPlayer();
-  drawFlash();
+  // Update stats
+  const allScores = [...data.cosmic, ...data.flug];
+  document.getElementById('globalRecord').textContent = allScores.length > 0
+    ? Math.max(...allScores.map(s => s.score))
+    : 0;
+  document.getElementById('totalPlayers').textContent = new Set(allScores.map(s => s.name)).size;
 }
 
-function die() {
-  state = 'dead';
-  if (score > (best || 0)) best = score;
-  spawnParticles(PLAYER_X + PLAYER_W/2, playerY + PLAYER_H/2, '#f43f5e', 18);
-  triggerFlash('#f43f5e');
-  cancelAnimationFrame(animId);
+initLeaderboard();
+renderLeaderboards();
 
-  // Last frame
-  drawBackground();
-  drawStars(0);
-  drawGround();
-  drawParticles();
-  drawFlash();
-
-  // Show overlay
-  overlay.innerHTML = `
-    <h1>💥 Game Over</h1>
-    <p class="final-score">Score: ${score}</p>
-    <p>Bestleistung: <strong>${best}</strong></p>
-    <button id="startBtn" onclick="startGame()">NOCHMAL</button>
-    <span class="hint">★ Münzen = +2 Punkte &nbsp;|&nbsp; 🛡️ Schild = Schutz</span>
-  `;
-  overlay.style.display = 'flex';
-}
-
-function startGame() {
-  overlay.style.display = 'none';
-  state = 'running';
-  initGame();
-  updateHUD();
-  lastObs = 0; lastCoin = 0; lastPowerup = 0;
-  loop();
-}
-
-// ── Controls ─────────────────────────────────────────────────────────────────
-document.addEventListener('keydown', e => {
-  if (e.code === 'Space' || e.code === 'ArrowUp') {
-    e.preventDefault();
-    jump();
-  }
-});
-
-let lastTap = 0;
-document.getElementById('gameWrapper').addEventListener('touchstart', e => {
-  e.preventDefault();
-  if (state !== 'running') return;
-  const now = Date.now();
-  jump();
-  lastTap = now;
-}, { passive: false });
-
-document.getElementById('gameWrapper').addEventListener('mousedown', e => {
-  if (state !== 'running') return;
-  jump();
-});
-
-document.getElementById('startBtn').addEventListener('click', startGame);
-
-// Initial idle render
-(function idleRender() {
-  drawBackground();
-  drawStars(2);
-  drawGround();
-  requestAnimationFrame(idleRender);
-  if (state !== 'idle') return;
-})();
+// Make functions global for game pages
+window.addScore = addScore;
+window.initLeaderboard = initLeaderboard;
 </script>
+
 </body>
 </html>
